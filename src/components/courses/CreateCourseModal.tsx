@@ -17,7 +17,21 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useAuth } from "../../hooks/useAuth";
-import { insertCourseSchema, type InsertCourse } from "@shared/schema";
+import { z } from "zod";
+
+const insertCourseSchema = z.object({
+  name: z.string().min(1, "Course name is required"),
+  code: z.string().min(1, "Course code is required"),
+  description: z.string().optional(),
+  gradeLevel: z.string().min(1, "Grade level is required"),
+  semester: z.string().min(1, "Semester is required"),
+  credits: z.number().min(1).max(6),
+  teacherId: z.string().optional(),
+  institutionId: z.string().optional(),
+  isActive: z.boolean().default(true),
+});
+
+type InsertCourse = z.infer<typeof insertCourseSchema>;
 import { coursesAPI } from "../../lib/api";
 import { useToast } from "../../hooks/use-toast";
 

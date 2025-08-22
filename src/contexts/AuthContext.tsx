@@ -1,6 +1,29 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, LoginCredentials, RegisterData } from '@shared/schema';
-import { apiRequest } from '@/lib/queryClient';
+// Local dummy types instead of importing from @shared/schema
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role?: string;
+  avatar?: string;
+  isActive?: boolean;
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface RegisterData {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+}
+import { apiRequest } from '../lib/queryClient';
 
 interface AuthContextType {
   user: User | null;

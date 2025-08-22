@@ -3,14 +3,14 @@ import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useAuth } from "@/hooks/useAuth";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import { useAuth } from "../hooks/useAuth";
 import { loginSchema, type LoginCredentials } from "@shared/schema";
-import { useToast } from "@/hooks/use-toast";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { useToast } from "../hooks/use-toast";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();

@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { AuthContext } from '@/contexts/AuthContext';
-import { useAuth as useAuthContext } from '@/contexts/AuthContext';
+import { AuthContext } from '../contexts/AuthContext';
+import { useAuth as useAuthContext } from '../contexts/AuthContext';
 
 // Re-export the useAuth hook from AuthContext for convenience
 export const useAuth = useAuthContext;
@@ -23,5 +23,5 @@ export function useIsRole(role: string) {
 
 export function useCanAccess(allowedRoles: string[]) {
   const { user } = useAuth();
-  return user ? allowedRoles.includes(user.role) : false;
+  return user ? allowedRoles.includes(user.role || '') : false;
 }
