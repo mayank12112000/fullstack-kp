@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* EduPlatform Theme Colors */
+  --primary: hsl(210, 83%, 42%); /* #1976D2 */
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(122, 39%, 49%); /* #388E3C */
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(32, 100%, 47%); /* #F57C00 */
+  --accent-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 46%); /* #757575 */
+  --muted-foreground: hsl(0, 0%, 20%);
+  --background: hsl(0, 0%, 98%); /* #FAFAFA */
+  --foreground: hsl(210, 11%, 15%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 11%, 15%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 11%, 15%);
+  --border: hsl(210, 20%, 90%);
+  --input: hsl(210, 20%, 95%);
+  --ring: hsl(210, 83%, 42%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  
+  /* Status Colors */
+  --success: hsl(122, 39%, 49%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(32, 100%, 47%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --error: hsl(0, 84%, 60%);
+  --error-foreground: hsl(0, 0%, 100%);
+  --info: hsl(210, 83%, 42%);
+  --info-foreground: hsl(0, 0%, 100%);
+
+  /* Chart Colors */
+  --chart-1: hsl(210, 83%, 42%);
+  --chart-2: hsl(122, 39%, 49%);
+  --chart-3: hsl(32, 100%, 47%);
+  --chart-4: hsl(280, 100%, 70%);
+  --chart-5: hsl(340, 75%, 55%);
+
+  /* Font Configuration */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Georgia', serif;
+  --font-mono: 'Menlo', 'Monaco', monospace;
+
+  /* Border Radius */
+  --radius: 0.75rem;
+
+  /* Sidebar Colors */
+  --sidebar-background: hsl(0, 0%, 100%);
+  --sidebar-foreground: hsl(210, 11%, 15%);
+  --sidebar-primary: hsl(210, 83%, 42%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(210, 20%, 95%);
+  --sidebar-accent-foreground: hsl(210, 83%, 42%);
+  --sidebar-border: hsl(210, 20%, 90%);
+  --sidebar-ring: hsl(210, 83%, 42%);
+}
+
+.dark {
+  --background: hsl(220, 13%, 9%);
+  --foreground: hsl(210, 20%, 90%);
+  --card: hsl(220, 13%, 12%);
+  --card-foreground: hsl(210, 20%, 90%);
+  --popover: hsl(220, 13%, 12%);
+  --popover-foreground: hsl(210, 20%, 90%);
+  --primary: hsl(210, 83%, 50%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(122, 39%, 60%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(32, 100%, 55%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(0, 0%, 35%);
+  --muted-foreground: hsl(210, 20%, 70%);
+  --border: hsl(220, 13%, 18%);
+  --input: hsl(220, 13%, 15%);
+  --ring: hsl(210, 83%, 50%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  --sidebar-background: hsl(220, 13%, 12%);
+  --sidebar-foreground: hsl(210, 20%, 90%);
+  --sidebar-primary: hsl(210, 83%, 50%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(220, 13%, 18%);
+  --sidebar-accent-foreground: hsl(210, 83%, 50%);
+  --sidebar-border: hsl(220, 13%, 18%);
+  --sidebar-ring: hsl(210, 83%, 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
+
+  h3 {
+    @apply text-xl;
+  }
+
+  h4 {
+    @apply text-lg;
+  }
+}
+
+@layer components {
+  /* Status Badge Styles */
+  .status-present {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
+  }
+
+  .status-absent {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
+  }
+
+  .status-late {
+    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100;
+  }
+
+  .status-excused {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
+  }
+
+  .status-active {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
+  }
+
+  .status-pending {
+    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100;
+  }
+
+  .status-completed {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100;
+  }
+
+  .status-graded {
+    @apply bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100;
+  }
+
+  /* Course Progress Bar */
+  .progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700;
+  }
+
+  .progress-fill {
+    @apply h-2 rounded-full transition-all duration-300;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 dark:bg-gray-600 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500 dark:bg-gray-500;
+  }
+
+  /* Card Hover Effects */
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Gradient Backgrounds */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(210, 83%, 42%) 0%, hsl(210, 83%, 52%) 100%);
+  }
+
+  .gradient-secondary {
+    background: linear-gradient(135deg, hsl(122, 39%, 49%) 0%, hsl(122, 39%, 59%) 100%);
+  }
+
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(32, 100%, 47%) 0%, hsl(32, 100%, 57%) 100%);
+  }
+
+  /* Dashboard Grid */
+  .dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+  }
+
+  .dashboard-card {
+    @apply bg-card rounded-xl border border-border p-6 shadow-sm;
+  }
+
+  /* Navigation Styles */
+  .nav-link {
+    @apply flex items-center px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-accent hover:bg-opacity-10 rounded-lg transition-colors;
+  }
+
+  .nav-link-active {
+    @apply text-primary bg-primary bg-opacity-10 hover:bg-primary hover:bg-opacity-20;
+  }
+}
+
+@layer utilities {
+  /* Text Utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Loading Animation */
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Focus Ring */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+}
