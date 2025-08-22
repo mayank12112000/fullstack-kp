@@ -12,7 +12,6 @@ import { Badge } from "../../components/ui/badge";
 import { useAuth } from "../../hooks/useAuth";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useQuery } from "@tanstack/react-query";
-import { notificationsAPI } from "../../lib/api";
 
 interface NavbarProps {
   title?: string;
@@ -23,17 +22,24 @@ export default function Navbar({ title = "EduPlatform" }: NavbarProps) {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Fetch notifications for current user
+  // For now, mock notifications until backend is ready
   const { data: notifications = [] } = useQuery({
-    queryKey: ['/api/notifications', user?.id],
+    queryKey: ["notifications", user?.id],
     enabled: !!user?.id,
+    // fake query function for now
+    queryFn: async () => {
+      return [
+        { id: 1, message: "Welcome to EduPlatform!", isRead: false },
+        { id: 2, message: "Your profile is incomplete.", isRead: true },
+      ];
+    },
   });
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleLogout = () => {
     logout();
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   const navItems = [
@@ -44,11 +50,12 @@ export default function Navbar({ title = "EduPlatform" }: NavbarProps) {
   ];
 
   // Show different nav items based on user role
-  const roleBasedItems = user?.role === 'teacher' 
-    ? [...navItems, { path: "/attendance", label: "Attendance" }, { path: "/gradebook", label: "Gradebook" }]
-    : user?.role === 'admin' || user?.role === 'institute_admin'
-    ? [...navItems, { path: "/reports", label: "Reports" }]
-    : navItems;
+  const roleBasedItems =
+    user?.role === "teacher"
+      ? [...navItems, { path: "/attendance", label: "Attendance" }, { path: "/gradebook", label: "Gradebook" }]
+      : user?.role === "admin"
+      ? [...navItems, { path: "/reports", label: "Reports" }]
+      : navItems;
 
   return (
     <nav className="bg-card border-b border-border sticky top-0 z-50 shadow-sm" data-testid="navbar">
@@ -72,7 +79,7 @@ export default function Navbar({ title = "EduPlatform" }: NavbarProps) {
                       <Link
                         key={item.path}
                         href={item.path}
-                        className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
+                        className={`nav-link ${isActive ? "nav-link-active" : ""}`}
                         data-testid={`nav-${item.label.toLowerCase()}`}
                       >
                         {item.label}
@@ -94,11 +101,7 @@ export default function Navbar({ title = "EduPlatform" }: NavbarProps) {
               className="w-9 h-9"
               data-testid="theme-toggle"
             >
-              {theme === 'light' ? (
-                <Moon className="h-4 w-4" />
-              ) : (
-                <Sun className="h-4 w-4" />
-              )}
+              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </Button>
 
             {user ? (
@@ -131,23 +134,11 @@ export default function Navbar({ title = "EduPlatform" }: NavbarProps) {
                       data-testid="user-menu"
                     >
                       <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                        {user.avatar ? (
-                          <img
-                            src={user.avatar}
-                            alt={`${user.firstName} ${user.lastName}`}
-                            className="w-8 h-8 rounded-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-4 w-4" />
-                        )}
+                        <User className="h-4 w-4" />
                       </div>
                       <div className="hidden md:block text-left">
-                        <p className="text-sm font-medium text-foreground">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {user.role.replace('_', ' ')}
-                        </p>
+                        <p className="text-sm font-medium text-foreground">{user.username}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{user.role}</p>
                       </div>
                     </Button>
                   </DropdownMenuTrigger>
