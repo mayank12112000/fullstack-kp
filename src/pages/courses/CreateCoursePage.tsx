@@ -13,7 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/ca
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../../components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { useAuth } from "../../hooks/useAuth";
-import { insertCourseSchema, type InsertCourse } from "@shared/schema";
+import { insertCourseSchema } from "../../shared/schema2";
+import type { InsertCourse } from "../../shared/schema2";
 import { coursesAPI } from "../../lib/api";
 import { useToast } from "../../hooks/use-toast";
 import { Link } from "wouter";
@@ -69,7 +70,7 @@ export default function CreateCoursePage() {
   };
 
   // Only allow teachers, admins, and institute admins to create courses
-  if (!user || !['teacher', 'admin', 'institute_admin'].includes(user.role)) {
+  if (!user || !['teacher', 'admin', 'institute_admin'].includes(user.role || '')) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

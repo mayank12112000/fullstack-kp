@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
 import { useAuth } from "../hooks/useAuth";
-import { loginSchema, type LoginCredentials } from "@shared/schema";
 import { useToast } from "../hooks/use-toast";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+
+// Local type (will later come from backend schema)
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
@@ -19,7 +23,6 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const form = useForm<LoginCredentials>({
-    resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -28,14 +31,13 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginCredentials) => {
     try {
+      // For now: just call local login (no backend)
       await login(data);
       toast({
         title: "Welcome back!",
         description: "You have been successfully logged in.",
       });
-      
-      // Redirect based on user role - this will be handled by the AuthContext
-      // The user object will be available after successful login
+
       setLocation("/");
     } catch (error: any) {
       toast({
@@ -68,6 +70,7 @@ export default function LoginPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="login-form">
+              {/* Username */}
               <FormField
                 control={form.control}
                 name="username"
@@ -86,6 +89,7 @@ export default function LoginPage() {
                 )}
               />
 
+              {/* Password */}
               <FormField
                 control={form.control}
                 name="password"

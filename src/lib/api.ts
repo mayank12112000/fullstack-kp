@@ -22,7 +22,7 @@ import type {
   InsertForumPost,
   InsertNotification,
   InsertCourseMaterial,
-} from '@shared/schema';
+} from '../shared/schema2';
 
 // Auth API
 export const authAPI = {

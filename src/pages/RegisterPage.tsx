@@ -1,278 +1,253 @@
-import { useState } from "react";
-import { Link, useLocation } from "wouter";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Users, CheckCircle, XCircle, Clock, Filter } from "lucide-react";
+import Navbar from "../components/layout/Navbar";
+import Sidebar from "../components/layout/Sidebar";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../components/ui/form";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table";
 import { useAuth } from "../hooks/useAuth";
-import { registerSchema, type RegisterData } from "@shared/schema";
 import { useToast } from "../hooks/use-toast";
-import LoadingSpinner from "../components/common/LoadingSpinner";
 
-export default function RegisterPage() {
-  const [, setLocation] = useLocation();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { register, isLoading } = useAuth();
+// Temporary mock data until backend is ready
+const mockCourses = [
+  { id: "c1", name: "Mathematics", code: "MATH101" },
+  { id: "c2", name: "Physics", code: "PHYS201" },
+];
+
+const mockStudents = [
+  { id: "s1", firstName: "Alice", lastName: "Johnson", email: "alice@example.com" },
+  { id: "s2", firstName: "Bob", lastName: "Smith", email: "bob@example.com" },
+  { id: "s3", firstName: "Charlie", lastName: "Brown", email: "charlie@example.com" },
+];
+
+type AttendanceStatus = "present" | "absent" | "late" | "excused";
+
+export default function AttendancePage() {
+  const { user } = useAuth();
   const { toast } = useToast();
+  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [attendanceData, setAttendanceData] = useState<Record<string, AttendanceStatus>>({});
 
-  const form = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-      role: "student",
-      isActive: true,
-    },
-  });
+  // Reset attendance when course changes
+  useEffect(() => {
+    setAttendanceData({});
+  }, [selectedCourse, selectedDate]);
 
-  const onSubmit = async (data: RegisterData) => {
-    try {
-      await register(data);
-      toast({
-        title: "Account created successfully!",
-        description: "Welcome to EduPlatform. You can now start using the platform.",
-      });
-      
-      setLocation("/");
-    } catch (error: any) {
-      toast({
-        title: "Registration failed",
-        description: error.message || "Something went wrong. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (isLoading) {
+  if (!user || !["teacher", "admin", "institute_admin"].includes(user.role || "")) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <LoadingSpinner size="lg" text="Creating your account..." />
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex">
+          <Sidebar />
+          <main className="flex-1 p-6">
+            <Card className="max-w-2xl mx-auto">
+              <CardContent className="pt-6 text-center">
+                <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+                <p className="text-muted-foreground">
+                  You don't have permission to manage attendance.
+                </p>
+              </CardContent>
+            </Card>
+          </main>
+        </div>
       </div>
     );
   }
 
+  const handleMarkAttendance = (studentId: string, status: AttendanceStatus) => {
+    setAttendanceData((prev) => ({
+      ...prev,
+      [studentId]: status,
+    }));
+    toast({
+      title: "Attendance Updated",
+      description: `Marked ${status} for student.`,
+    });
+  };
+
+  const getAttendanceStatus = (studentId: string): AttendanceStatus => {
+    return attendanceData[studentId] || "absent"; // safer default
+  };
+
+  const getAttendanceStats = () => {
+    const total = mockStudents.length;
+    const present = mockStudents.filter((s) => getAttendanceStatus(s.id) === "present").length;
+    const absent = mockStudents.filter((s) => getAttendanceStatus(s.id) === "absent").length;
+    const late = mockStudents.filter((s) => getAttendanceStatus(s.id) === "late").length;
+    const excused = mockStudents.filter((s) => getAttendanceStatus(s.id) === "excused").length;
+
+    return { total, present, absent, late, excused };
+  };
+
+  const stats = getAttendanceStats();
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
-      <Card className="w-full max-w-2xl card-hover" data-testid="register-card">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-primary" data-testid="register-title">
-            Join EduPlatform
-          </CardTitle>
-          <CardDescription data-testid="register-description">
-            Create your account to start your educational journey
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="register-form">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>First Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your first name"
-                          {...field}
-                          data-testid="input-firstname"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter your last name"
-                          {...field}
-                          data-testid="input-lastname"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Choose a unique username"
-                        {...field}
-                        data-testid="input-username"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your email address"
-                        {...field}
-                        data-testid="input-email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger data-testid="select-role">
-                          <SelectValue placeholder="Select your role" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="student">Student</SelectItem>
-                        <SelectItem value="teacher">Teacher</SelectItem>
-                        <SelectItem value="admin">Administrator</SelectItem>
-                        <SelectItem value="institute_admin">Institute Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Create a password"
-                            {...field}
-                            data-testid="input-password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                            onClick={() => setShowPassword(!showPassword)}
-                            data-testid="toggle-password"
-                          >
-                            {showPassword ? (
-                              <EyeOff className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showConfirmPassword ? "text" : "password"}
-                            placeholder="Confirm your password"
-                            {...field}
-                            data-testid="input-confirm-password"
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            data-testid="toggle-confirm-password"
-                          >
-                            {showConfirmPassword ? (
-                              <EyeOff className="h-4 w-4 text-muted-foreground" />
-                            ) : (
-                              <Eye className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full gradient-primary text-white"
-                disabled={form.formState.isSubmitting}
-                data-testid="submit-button"
-              >
-                {form.formState.isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </Button>
-            </form>
-          </Form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login" className="text-primary hover:underline font-medium" data-testid="login-link">
-                Sign in here
-              </Link>
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 p-6">
+          {/* Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-foreground" data-testid="attendance-title">
+              Attendance Management
+            </h2>
+            <p className="text-muted-foreground mt-2">
+              Track and manage student attendance for your courses.
             </p>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Filters */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Filter className="mr-2 h-5 w-5" />
+                Select Course & Date
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Course</label>
+                  <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                    <SelectTrigger data-testid="course-select">
+                      <SelectValue placeholder="Select a course" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {mockCourses.map((course) => (
+                        <SelectItem key={course.id} value={course.id}>
+                          {course.name} ({course.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Date</label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    data-testid="date-input"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {selectedCourse ? (
+            <>
+              {/* Attendance Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+                <Card><CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-sm text-muted-foreground">Total Students</div>
+                </CardContent></Card>
+                <Card><CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-600">{stats.present}</div>
+                  <div className="text-sm text-muted-foreground">Present</div>
+                </CardContent></Card>
+                <Card><CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-red-600">{stats.absent}</div>
+                  <div className="text-sm text-muted-foreground">Absent</div>
+                </CardContent></Card>
+                <Card><CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{stats.late}</div>
+                  <div className="text-sm text-muted-foreground">Late</div>
+                </CardContent></Card>
+                <Card><CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-600">{stats.excused}</div>
+                  <div className="text-sm text-muted-foreground">Excused</div>
+                </CardContent></Card>
+              </div>
+
+              {/* Attendance Table */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>
+                      Attendance for {mockCourses.find((c) => c.id === selectedCourse)?.name}
+                    </CardTitle>
+                    <div className="text-sm text-muted-foreground">
+                      {new Date(selectedDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {mockStudents.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No students enrolled</h3>
+                      <p className="text-muted-foreground">No students are enrolled in this course.</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Student Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mockStudents.map((student) => {
+                          const currentStatus = getAttendanceStatus(student.id);
+
+                          return (
+                            <TableRow key={student.id}>
+                              <TableCell>{student.firstName} {student.lastName}</TableCell>
+                              <TableCell className="text-muted-foreground">{student.email}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline">{currentStatus}</Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex space-x-2">
+                                  <Button
+                                    size="sm"
+                                    variant={currentStatus === "present" ? "default" : "outline"}
+                                    onClick={() => handleMarkAttendance(student.id, "present")}
+                                  ><CheckCircle className="h-4 w-4" /></Button>
+                                  <Button
+                                    size="sm"
+                                    variant={currentStatus === "absent" ? "default" : "outline"}
+                                    onClick={() => handleMarkAttendance(student.id, "absent")}
+                                  ><XCircle className="h-4 w-4" /></Button>
+                                  <Button
+                                    size="sm"
+                                    variant={currentStatus === "late" ? "default" : "outline"}
+                                    onClick={() => handleMarkAttendance(student.id, "late")}
+                                  ><Clock className="h-4 w-4" /></Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Select a Course</h3>
+                <p className="text-muted-foreground">
+                  Choose a course from the dropdown above to start taking attendance.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </main>
+      </div>
     </div>
   );
 }

@@ -26,7 +26,7 @@ export type {
   InsertCourseMaterial,
   LoginCredentials,
   RegisterData,
-} from '@shared/schema';
+} from '../shared/schema2';
 
 // Additional frontend-specific types
 export interface DashboardStats {
